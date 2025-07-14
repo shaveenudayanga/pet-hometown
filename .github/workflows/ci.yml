@@ -1,0 +1,12 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3; with: node-version: '18'
+      - run: docker-compose -f docker-compose.yml up --build -d
+      - run: npm test --prefix backend
+      - run: npm test --prefix frontend
+      - run: docker-compose down

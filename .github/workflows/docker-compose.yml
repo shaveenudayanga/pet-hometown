@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  frontend:
+    build: ./frontend
+    ports: ["3000:3000"]
+    env_file: .env
+    depends_on: [backend]
+
+  backend:
+    build: ./backend
+    ports: ["8080:8080"]
+    env_file: .env
+    depends_on: [postgres]
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: po_store
+    volumes: [pgdata:/var/lib/postgresql/data]
+
+  stripe-cli:
+    image: stripe/stripe-cli:latest
+    env_file: .env
+    command: >
+      listen
+      --forward-to http://backend:8080/api/stripe/webhook
+
+volumes:
+  pgdata:
